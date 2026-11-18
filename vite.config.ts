@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  // Relative asset paths, so the build works under GitHub Pages' /go-visualizers/ sub-path.
+  base: './',
   plugins: [react(), tailwindcss()],
   server: {
     host: '127.0.0.1',
