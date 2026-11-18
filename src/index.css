@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #09090b;
+  color: #e4e4e7;
+  font-family: var(--font-sans);
+}
+
+@keyframes frame-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes frame-out {
+  to {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.96);
+    filter: blur(1px);
+  }
+}
+
+@keyframes heap-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sweep-out {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+    filter: grayscale(1);
+  }
+}
+
+@keyframes sweep-line {
+  0% {
+    top: -8%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    top: 108%;
+    opacity: 0.15;
+  }
+}
+
+@keyframes mark-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.0);
+  }
+  40% {
+    box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.55), 0 0 24px rgba(52, 211, 153, 0.18);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+@keyframes stat-pop {
+  0% {
+    transform: translateY(4px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.frame-in {
+  animation: frame-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.frame-out {
+  animation: frame-out 0.48s ease forwards;
+}
+
+.heap-in {
+  animation: heap-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sweep-out {
+  animation: sweep-out 0.5s ease 0.42s forwards;
+}
+
+.gc-sweep-line {
+  animation: sweep-line 0.9s ease-in-out forwards;
+}
+
+.mark-glow {
+  animation: mark-glow 0.8s ease;
+}
+
+.stat-pop {
+  animation: stat-pop 0.35s ease;
+}
+
+.toast-in {
+  animation: toast-in 0.28s ease both;
+}
+
+.term-cursor {
+  animation: blink 1.05s steps(1) infinite;
+}
+
+.panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.panel-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 99px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame-in,
+  .frame-out,
+  .heap-in,
+  .sweep-out,
+  .gc-sweep-line,
+  .mark-glow,
+  .stat-pop,
+  .toast-in,
+  .term-cursor {
+    animation: none !important;
+  }
+}
