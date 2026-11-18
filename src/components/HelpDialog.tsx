@@ -5,6 +5,7 @@ const SHORTCUTS = [
   ['E', 'Escape the next pointer to the heap'],
   ['R', 'Return the top frame'],
   ['G', 'Trigger garbage collection'],
+  ['B', 'Open the beginner basics'],
   ['W', 'Toggle the walkthrough'],
   ['C', 'Choose a specific call'],
   ['?', 'Toggle this reference'],

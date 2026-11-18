@@ -6,6 +6,7 @@ const STEPS = [
     label: 'Stack',
     title: 'Prove a local stays in the frame',
     detail: 'processData uses an int and a fixed array only inside the function. The compiler prints “does not escape”.',
+    simple: 'The function only needs its values while it runs, so they live on its notepad (the stack) and vanish when it returns.',
     action: 'Run processData',
     tone: 'stack' as const,
   },
@@ -14,6 +15,7 @@ const STEPS = [
     label: 'Escape',
     title: 'Return a pointer',
     detail: 'newUser returns &u. The User cannot live in a frame that is about to disappear, so it moves to the heap.',
+    simple: 'The function hands back the address of its value. The value has to outlive the function, so Go keeps it in the storage room (the heap).',
     action: 'Run newUser',
     tone: 'heap' as const,
   },
@@ -22,6 +24,7 @@ const STEPS = [
     label: 'Return',
     title: 'Watch the pointer move to the caller',
     detail: 'Returning the frame does not free the heap object. The pointer is stored in the caller and stays reachable.',
+    simple: 'The function is done and its notepad is gone, but the heap value stays, because the caller still holds its address.',
     action: 'Return frame',
     tone: 'pop' as const,
   },
@@ -30,6 +33,7 @@ const STEPS = [
     label: 'Drop',
     title: 'Escape, then drop the only pointer',
     detail: 'spill passes &x to an unknown function. After return, nothing references it — it waits for GC.',
+    simple: 'The address is handed to another function, so the value goes to the heap. After the return, nobody holds that address any more.',
     action: 'Run spill',
     tone: 'heap' as const,
   },
@@ -38,6 +42,7 @@ const STEPS = [
     label: 'Sweep',
     title: 'Collect unreachable objects',
     detail: 'Mark-sweep frees objects with no stack pointer and no package root. A sink leak is a GC root and survives.',
+    simple: 'The cleaner walks the heap and frees every value nobody points to. Values a package variable still points to are kept.',
     action: 'Run GC',
     tone: 'gc' as const,
   },
@@ -82,6 +87,10 @@ export function LessonBar({
         <div className="min-w-0 max-w-3xl">
           <p className="text-sm font-medium text-zinc-100">{current.title}</p>
           <p className="mt-0.5 text-sm leading-relaxed text-zinc-400">{current.detail}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-emerald-200/90">
+            <span className="font-medium text-emerald-300">In simple words: </span>
+            {current.simple}
+          </p>
         </div>
         <button
           type="button"

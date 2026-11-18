@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { BasicsDialog } from './components/BasicsDialog'
 import { CallPicker } from './components/CallPicker'
 import { HeapPanel } from './components/HeapPanel'
 import { HelpDialog } from './components/HelpDialog'
@@ -11,17 +12,44 @@ import { backrefs, useRuntime } from './runtime'
 import type { Pulse, ToastTone } from './types'
 import { cn, formatInt, formatKB } from './utils'
 
+const BASICS_SEEN = 'gomem.basics-seen'
+
+/** First-time visitors get the plain-language primer before the simulator. */
+function firstVisit() {
+  try {
+    return localStorage.getItem(BASICS_SEEN) !== '1'
+  } catch {
+    return false
+  }
+}
+
 export default function App() {
   const { state, stats, allocate, escape, popFrame, collect, reset, clearLogs, select, showAnalysis, dismissToast } = useRuntime()
   const refs = useMemo(() => backrefs(state.frames), [state.frames])
   const busy = state.phase !== 'idle'
+  const [basicsOpen, setBasicsOpen] = useState(firstVisit)
   const [helpOpen, setHelpOpen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [lessonOpen, setLessonOpen] = useState(false)
   const [lessonStep, setLessonStep] = useState(0)
   const nextStack = nextStackScenario(state.stackCursor)
   const nextHeap = nextHeapScenario(state.heapCursor)
-  const overlayOpen = helpOpen || pickerOpen
+  const overlayOpen = basicsOpen || helpOpen || pickerOpen
+
+  function closeBasics() {
+    setBasicsOpen(false)
+    try {
+      localStorage.setItem(BASICS_SEEN, '1')
+    } catch {
+      // private mode: the primer simply shows again next visit
+    }
+  }
+
+  function startWalkthrough() {
+    closeBasics()
+    setLessonStep(0)
+    setLessonOpen(true)
+  }
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -29,6 +57,7 @@ export default function App() {
       if (target instanceof HTMLElement && target.closest('input, textarea, select')) return
       if (event.metaKey || event.ctrlKey || event.altKey) return
       if (event.key === 'Escape') {
+        if (basicsOpen) closeBasics()
         setHelpOpen(false)
         setPickerOpen(false)
         select(null)
@@ -37,6 +66,11 @@ export default function App() {
       if (event.key === '?') {
         setPickerOpen(false)
         setHelpOpen((open) => !open)
+        return
+      }
+      if (event.key.toLowerCase() === 'b' && !helpOpen && !pickerOpen) {
+        if (basicsOpen) closeBasics()
+        else setBasicsOpen(true)
         return
       }
       if (overlayOpen || busy) return
@@ -51,7 +85,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [allocate, busy, collect, escape, overlayOpen, popFrame, reset, select])
+  }, [allocate, basicsOpen, busy, collect, escape, helpOpen, overlayOpen, pickerOpen, popFrame, reset, select])
 
   function runLesson(id: string) {
     if (busy) return
@@ -78,6 +112,7 @@ export default function App() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <StatusChip phase={state.phase} depth={state.frames.length} clockMs={state.clockMs} />
+              <SecondaryButton label="Basics" shortcut="B" onClick={() => setBasicsOpen(true)} />
               <SecondaryButton label="Walkthrough" shortcut="W" onClick={() => setLessonOpen((open) => !open)} />
               <SecondaryButton label="Choose call" shortcut="C" onClick={() => setPickerOpen(true)} disabled={busy} />
               <SecondaryButton label="Shortcuts" shortcut="?" onClick={() => setHelpOpen(true)} />
@@ -224,6 +259,7 @@ export default function App() {
         </main>
       </div>
 
+      {basicsOpen && <BasicsDialog onClose={closeBasics} onWalkthrough={startWalkthrough} />}
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {pickerOpen && (
         <CallPicker
